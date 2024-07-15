@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/user/*")
 public class UserController extends HttpServlet {
@@ -35,10 +36,10 @@ public class UserController extends HttpServlet {
 			request.getRequestDispatcher("/WEB-INF/views/user/signup.jsp").forward(request, response);
 			break;
 		case "/signin":
-			// TODO 로그인 페이지 이동 처리
+			request.getRequestDispatcher("/WEB-INF/views/user/signin.jsp").forward(request, response);
 			break;
 		case "/logout":
-			// TODO 로그아웃 기능 추가 예정
+			handleLogout(request, response);
 			break;
 		default:
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -46,7 +47,25 @@ public class UserController extends HttpServlet {
 		}
 	}
 
+	private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession session = request.getSession();
+		session.invalidate();
+		response.sendRedirect(request.getContextPath());
+	}
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getPathInfo();
+		switch (action) {
+		case "/signup":
+			// TODO 회원가입 처리
+			break;
+		case "/signin":
+			// TODO 로그인 처리
+			break;
+		default:
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			break;
+		}
 	}
 
 }
