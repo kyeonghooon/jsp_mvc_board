@@ -18,7 +18,7 @@
 <body>
 	<div class="container">
 		<h2>회원가입</h2>
-		<form action="${page.Context.request.contextPath}/user/signup" method="post">
+		<form action="${pageContext.request.contextPath}/user/signup" method="post">
 			<div class="form-group">
 				<label for="username">Username : </label>
 				<input type="text" name="username" id="username" value="고길동" required>

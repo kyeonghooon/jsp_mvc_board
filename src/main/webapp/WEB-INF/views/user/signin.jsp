@@ -18,7 +18,10 @@
 <body>
 	<div class="container">
 		<h2>로그인</h2>
-		<form action="${page.Context.request.contextPath}/user/signin" method="post">
+		<c:if test="${not empty errorMessage}">
+			<p style="color: red;">"${errorMessage}"</p>
+		</c:if>
+		<form action="${pageContext.request.contextPath}/user/signin" method="post">
 			<div class="form-group">
 				<label for="username">Username : </label>
 				<input type="text" name="username" id="username" value="고길동" required>
