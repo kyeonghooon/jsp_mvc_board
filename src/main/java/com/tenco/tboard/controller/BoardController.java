@@ -44,6 +44,24 @@ public class BoardController extends HttpServlet {
 	 * @throws ServletException 
 	 */
 	private void handleListBoards(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 게시글 목록 조회 기능
+		int page = 1; // 기본 페이지 번호
+		int pageSize = 3; // 한 페이지당 보여질 게시글 수
+		
+		try {
+			String pageStr = request.getParameter("page");
+			if (pageStr != null) {
+				page = Integer.parseInt(pageStr);
+			}
+		} catch (Exception e) {
+			// 유효하지 않은 번호를 마음대로 보낼 경우
+			page = 1;
+		}
+		int offset = (page - 1) * pageSize; // 시작 위치 계산 (offset 값 계산)
+		
+		System.out.println("page : " + page);
+		System.out.println("offset : " + offset);
 		request.getRequestDispatcher("/WEB-INF/views/board/list.jsp").forward(request, response);
 	}
 
