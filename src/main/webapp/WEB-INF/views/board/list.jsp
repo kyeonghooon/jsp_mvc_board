@@ -17,21 +17,21 @@
         <a href="${pageContext.request.contextPath}">홈 화면</a>
     </div>
 
-    <!-- board list 생성 -->
-    <!-- 반복문 사용 예정 -->
+	<c:forEach var="board" items="${boardList}">
     <div class="board-item">
-
+		<h3><a href="#">${board.title}</a></h3>
+		<p>${board.content}</p>
+		<!-- 게시글의 작성자가 세션 유저와 동일하다면 수정, 삭제 버튼을 보여주자 -->
+        <a class="btn btn-edit" href="#">수정</a>
+        <a class="btn btn-delete" href="#">삭제</a>
     </div>
+    </c:forEach>
     <br>
-    <div>
-        <%
-            // localhost:8080/t-board/board/list?page=1
-            // localhost:8080/t-board/board/list?page=2
-        %>
-        <span>1</span><br>
-        <span><a href="${pageContext.request.contextPath}/board/list?page=2">2</a></span><br>
-        <span>3</span><br>
-        <span>4</span><br>
+    <div class="pagination">
+    	
+		<c:forEach var="i" begin="1" end="${totalPages}">
+			<span><a href="${pageContext.request.contextPath}/board/list?page=${i}">${i}</a></span><br>
+		</c:forEach>
     </div>
 </body>
 </html>

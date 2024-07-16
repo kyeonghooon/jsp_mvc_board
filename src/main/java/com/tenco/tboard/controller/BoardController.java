@@ -1,6 +1,11 @@
 package com.tenco.tboard.controller;
 
 import java.io.IOException;
+import java.util.List;
+
+import com.tenco.tboard.model.Board;
+import com.tenco.tboard.repository.interfaces.BoardRepository;
+import com.tenco.tboard.repository.interfaces.BoardRepositoryImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,7 +15,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/board/*")
 public class BoardController extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
+	private BoardRepository boardRepository;
 
 	public BoardController() {
 		super();
@@ -18,7 +25,7 @@ public class BoardController extends HttpServlet {
 	
 	@Override
 	public void init() throws ServletException {
-		// TODO BoardRepository 추가 예정
+		boardRepository = new BoardRepositoryImpl();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,8 +67,15 @@ public class BoardController extends HttpServlet {
 		}
 		int offset = (page - 1) * pageSize; // 시작 위치 계산 (offset 값 계산)
 		
-		System.out.println("page : " + page);
-		System.out.println("offset : " + offset);
+		List<Board> boardList = boardRepository.getAllBoards(pageSize, offset);
+		request.setAttribute("boardList", boardList);
+		
+		// 전체 게시글 수 조회
+		int totalBoards = boardRepository.getTotalBoardCount();
+		
+		// 총 페이지 수 계산
+		int totalPages = (int)Math.ceil((double)totalBoards / pageSize); 
+		request.setAttribute("totalPages", totalPages);
 		request.getRequestDispatcher("/WEB-INF/views/board/list.jsp").forward(request, response);
 	}
 
