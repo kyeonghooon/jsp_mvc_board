@@ -38,17 +38,95 @@ public class BoardController extends HttpServlet {
 			return;
 		}
 		switch (action) {
+		case "/delete":
+			handleDeleteBoard(request, response, session);
+			break;
+		case "/update":
+			showEditBoardForm(request, response, session);
+			break;
 		case "/create":
 			showCreateBoardForm(request, response, session);
 			break;
 		case "/list":
 			handleListBoards(request, response, session);
 			break;
+		case "/view":
+			showViewBoard(request, response, session);
+			break;
+		case "/deleteComment":
+			handleDeleteComment(request, response, session);
+			break;
 
 		default:
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			break;
 		}
+	}
+
+	/**
+	 * TODO 댓글 삭제 기능
+	 * @param request
+	 * @param response
+	 * @param session
+	 */
+	private void handleDeleteComment(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * TODO 상세 보기 화면 이동
+	 * @param request
+	 * @param response
+	 * @param session
+	 */
+	private void showViewBoard(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		try {
+			int id = Integer.parseInt(request.getParameter("id"));
+			System.out.println("id : " + id);
+			Board board = boardRepository.getBoardById(id);
+			if (board == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+			request.setAttribute("board", board);
+			
+			// 현재 로그인한 사용자의 ID
+			User user = (User) session.getAttribute("principal");
+			if (user != null) {
+				request.setAttribute("userId", user.getId());
+			} else {
+				response.sendRedirect(request.getContextPath() + "/user/signin");
+			}
+			
+			// TODO - 댓글 조회
+			// 댓글 조회 및 권환 학인 추가 예정
+			
+			request.getRequestDispatcher("/WEB-INF/views/board/view.jsp").forward(request, response);
+			
+			
+		} catch (Exception e) {
+			// TODO 스크립트 백
+		}
+	}
+
+	/**
+	 * TODO 수정 폼 화면 이동 (인증 검사 반드시 처리)
+	 * @param request
+	 * @param response
+	 * @param session
+	 */
+	private void showEditBoardForm(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+	}
+	
+	/**
+	 * TODO 게시글 삭제 기능 만들기
+	 * @param request
+	 * @param response
+	 * @param session
+	 */
+	private void handleDeleteBoard(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -62,12 +140,6 @@ public class BoardController extends HttpServlet {
 	 */
 	private void showCreateBoardForm(HttpServletRequest request, HttpServletResponse response, HttpSession session)
 			throws ServletException, IOException {
-		if (session != null) {
-			User user = (User) session.getAttribute("principal");
-			if (user != null) {
-				request.setAttribute("userId", user.getId());
-			}
-		}
 		request.getRequestDispatcher("/WEB-INF/views/board/create.jsp").forward(request, response);
 	}
 
@@ -152,12 +224,11 @@ public class BoardController extends HttpServlet {
 	 */
 	private void handleCreateBoard(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
 		// 유효성 검사 생략
-		Board board = Board.builder()
+		boardRepository.addBoard(Board.builder()
 				.title(request.getParameter("title"))
 				.content(request.getParameter("content"))
 				.userId(((User) session.getAttribute("principal")).getId())
-				.build();
-		boardRepository.addBoard(board);
+				.build());
 		response.sendRedirect(request.getContextPath() + "/board/list?page=1");
 	}
 

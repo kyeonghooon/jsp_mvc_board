@@ -18,7 +18,7 @@
 	<c:forEach var="board" items="${boardList}">
 		<div class="board-item">
 			<h3>
-				<a href="#">${board.title}</a>
+				<a href="${pageContext.request.contextPath}/board/view?id=${board.id}">${board.title}</a>
 			</h3>
 			<p>${board.content}</p>
 			<p>
@@ -26,8 +26,8 @@
 			</p>
 			<!-- 게시글의 작성자가 세션 유저와 동일하다면 수정, 삭제 버튼을 보여주자 -->
 			<c:if test="${userId == board.userId}">
-				<a class="btn btn-edit" href="#">수정</a>
-				<a class="btn btn-delete" href="#">삭제</a>
+				<a class="btn btn-edit" href="${pageContext.request.contextPath}/board/edit">수정</a>
+				<a class="btn btn-delete" href="${pageContext.request.contextPath}/board/delete">삭제</a>
 			</c:if>
 		</div>
 	</c:forEach>

@@ -15,10 +15,13 @@ public class BoardRepositoryImpl implements BoardRepository {
 	private final String SELECT_ALL_BOARDS = " SELECT * FROM board ORDER BY created_at DESC limit ? offset ? ";
 	private final String COUNT_ALL_BOARDS = " SELECT count(*) AS count FROM board ";
 	private final String INSERT_BOARD_SQL = " INSERT INTO board(user_id, title, content) VALUES (?,?,?) ";
-	
+	private final String DELETE_BOARD_SQL = " DELETE FROM board WHERE id = ? ";
+	private final String SELECT_BOARD_BY_ID = " SELECT * FROM board WHERE id = ? ";
+	private final String UPDATE_BOARD_SQL = " UPDATE board SET title = ?, content = ? WHERE id = ? ";
+
 	@Override
 	public void addBoard(Board board) {
-		try (Connection conn = DBUtil.getConnection()){
+		try (Connection conn = DBUtil.getConnection()) {
 			conn.setAutoCommit(false);
 			try (PreparedStatement pstmt = conn.prepareStatement(INSERT_BOARD_SQL)) {
 				pstmt.setInt(1, board.getUserId());
@@ -36,21 +39,67 @@ public class BoardRepositoryImpl implements BoardRepository {
 	}
 
 	@Override
-	public void updateBoard(Board board, int principalId) {
-		// TODO Auto-generated method stub
-
+	public void updateBoard(Board board) {
+		try (Connection conn = DBUtil.getConnection()) {
+			conn.setAutoCommit(false);
+			try (PreparedStatement pstmt = conn.prepareStatement(UPDATE_BOARD_SQL)) {
+				pstmt.setString(1, board.getTitle());
+				pstmt.setString(2, board.getContent());
+				pstmt.setInt(3, board.getId());
+				pstmt.executeUpdate();
+				conn.commit();
+			} catch (Exception e) {
+				conn.rollback();
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void deleteBoard(int id, int principalId) {
-		// TODO Auto-generated method stub
-
+	public void deleteBoard(int id) {
+		try (Connection conn = DBUtil.getConnection()) {
+			conn.setAutoCommit(false);
+			try (PreparedStatement pstmt = conn.prepareStatement(DELETE_BOARD_SQL)) {
+				pstmt.setInt(1, id);
+				pstmt.executeUpdate();
+				conn.commit();
+			} catch (Exception e) {
+				conn.rollback();
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public Board getBoardById(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Board board = null;
+
+		try (Connection conn = DBUtil.getConnection();//
+				PreparedStatement pstmt = conn.prepareStatement(SELECT_BOARD_BY_ID)) {
+			pstmt.setInt(1, id);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					board = Board.builder()
+						.id(rs.getInt("id"))
+						.userId(rs.getInt("user_id"))
+						.title(rs.getString("title"))
+						.content(rs.getString("content"))
+						.createdAt(rs.getTimestamp("created_at"))
+						.build();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return board;
 	}
 
 	@Override
