@@ -83,7 +83,7 @@ public class UserController extends HttpServlet {
 		// 데이터 유효성 검사 생략
 		User principal = userRepository.getUserByUsernameAndPassword(username, password);
 		if (principal != null && principal.getPassword().equals(password)) {
-			request.getSession().setAttribute("user", principal);
+			request.getSession().setAttribute("principal", principal);
 			response.sendRedirect(request.getContextPath() + "/board/list");
 		} else {
 			request.setAttribute("errorMessage", "잘못된 요청입니다.");
