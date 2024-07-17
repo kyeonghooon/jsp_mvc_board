@@ -32,20 +32,20 @@
 
 		<h3>댓글</h3>
 		<!-- 댓글 리스트 작성 -->
-		<c:forEach var="comment" items="${comments}">
-			<div class="comment-item">
+		<div class="comment-item">
+			<c:forEach var="comment" items="${commentList}">
 				<p>
-					<strong>${comment.userName}</strong>
+					<strong>${comment.username}</strong>
 				</p>
 				<p>${comment.content}</p>
 				<p class="comment-date">
 					<fmt:formatDate value="${comment.createdAt}" pattern="yyyy-MM-dd HH:mm" />
 				</p>
-			</div>
-		</c:forEach>
+			</c:forEach>
+		</div>
 		<!-- 댓글 작성 폼 -->
 		<div class="comment-form">
-			<form action="${pageContext.request.contextPath}/comment/add" method="post">
+			<form action="${pageContext.request.contextPath}/board/addComment" method="post">
 				<textarea name="content" rows="5" placeholder="댓글을 작성해 주세요..."></textarea>
 				<input type="hidden" name="boardId" value="${board.id}">
 				<button type="submit" class="btn btn-submit">댓글 작성</button>

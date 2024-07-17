@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import com.tenco.tboard.model.Board;
+import com.tenco.tboard.model.Comment;
 import com.tenco.tboard.model.User;
 import com.tenco.tboard.repository.BoardRepositoryImpl;
+import com.tenco.tboard.repository.CommentRepositoryImpl;
 import com.tenco.tboard.repository.interfaces.BoardRepository;
+import com.tenco.tboard.repository.interfaces.CommentRepository;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,6 +23,7 @@ public class BoardController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	private BoardRepository boardRepository;
+	private CommentRepository commentRepository;
 
 	public BoardController() {
 		super();
@@ -28,6 +32,7 @@ public class BoardController extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		boardRepository = new BoardRepositoryImpl();
+		commentRepository = new CommentRepositoryImpl();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -82,13 +87,11 @@ public class BoardController extends HttpServlet {
 	 */
 	private void showViewBoard(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 		try {
-			int id = Integer.parseInt(request.getParameter("id"));
-			System.out.println("id : " + id);
-			Board board = boardRepository.getBoardById(id);
+			int boardId = Integer.parseInt(request.getParameter("id"));
+			Board board = boardRepository.getBoardById(boardId);
 			if (board == null) {
 				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
-			request.setAttribute("board", board);
 			
 			// 현재 로그인한 사용자의 ID
 			User user = (User) session.getAttribute("principal");
@@ -98,9 +101,10 @@ public class BoardController extends HttpServlet {
 				response.sendRedirect(request.getContextPath() + "/user/signin");
 			}
 			
-			// TODO - 댓글 조회
-			// 댓글 조회 및 권환 학인 추가 예정
+			List<Comment> commentList = commentRepository.getCommentsByBoardId(boardId);
 			
+			request.setAttribute("board", board);
+			request.setAttribute("commentList", commentList);
 			request.getRequestDispatcher("/WEB-INF/views/board/view.jsp").forward(request, response);
 			
 			
@@ -206,12 +210,31 @@ public class BoardController extends HttpServlet {
 		case "/edit":
 			break;
 		case "/addComment":
+			handleCreateComment(request, response, session);
 			break;
 
 		default:
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			break;
 		}
+	}
+
+	/**
+	 * 댓글 생성 처리
+	 * @param request
+	 * @param response
+	 * @param session
+	 * @throws IOException 
+	 */
+	private void handleCreateComment(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+		// 유효성 검사 생략
+		commentRepository.addComment(Comment.builder()
+				.boardId(Integer.parseInt(request.getParameter("boardId")))
+				.userId(((User)session.getAttribute("principal")).getId())
+				.content(request.getParameter("content"))
+				.build()
+				);
+		response.sendRedirect(request.getContextPath() + "/board/view?id=" + request.getParameter("boardId"));
 	}
 
 	/**
